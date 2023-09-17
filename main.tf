@@ -27,25 +27,24 @@ resource "aws_security_group" "main" {
   }
 }
 
-resource "aws_rds_cluster_parameter_group" "main" {
-  name   = "${local.name_prefix}-pg"
-  family = var.engine_family
-  tags        = merge(local.tags, { Name = "${local.name_prefix}-pg" })
+resource "aws_db_parameter_group" "main" {
+    name   = "${local.name_prefix}-pg"
+    family = var.engine_family
 }
 
-resource "aws_rds_cluster" "main" {
-  cluster_identifier      = "${local.name_prefix}-cluster"
-  engine                  = var.engine
-  engine_version          = var.engine_version
-  db_subnet_group_name    = aws_db_subnet_group.main.name
-  database_name           = data.aws_ssm_parameter.database_name.value
-  master_username         = data.aws_ssm_parameter.master_username.value
-  master_password         = data.aws_ssm_parameter.master_password.value
-  backup_retention_period = var.backup_retention_period
-  preferred_backup_window = var.preferred_backup_window
-  db_instance_parameter_group_name = aws_rds_cluster_parameter_group.main.name
-  vpc_security_group_ids = [aws_security_group.main.id]
-  skip_final_snapshot = var.skip_final_snapshot
-  tags        = merge(local.tags, { Name = "${local.name_prefix}-cluster" })
 
+resource "aws_rds_cluster" "main" {
+  cluster_identifier               = "${local.name_prefix}-cluster"
+  engine                           = var.engine
+  engine_version                   = var.engine_version
+  db_subnet_group_name             = aws_db_subnet_group.main.name
+  database_name                    = data.aws_ssm_parameter.database_name.value
+  master_username                  = data.aws_ssm_parameter.master_username.value
+  master_password                  = data.aws_ssm_parameter.master_password.value
+  backup_retention_period          = var.backup_retention_period
+  preferred_backup_window          = var.preferred_backup_window
+  db_instance_parameter_group_name = aws_db_parameter_group.main.name
+  vpc_security_group_ids           = [aws_security_group.main.id]
+  skip_final_snapshot              = var.skip_final_snapshot
+  tags                             = merge(local.tags, { Name = "${local.name_prefix}-cluster" })
 }
